@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "./App.css";
 import Map from "./components/Map";
-import mainImage from "./assets/mainImage.jpg"; // Adjust the import if the path is different
+import mainImage from "./assets/mainImage.jpg"; 
 
 function App() {
   const [opacity, setOpacity] = useState(1);
