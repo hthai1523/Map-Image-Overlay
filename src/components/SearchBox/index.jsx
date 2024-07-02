@@ -80,7 +80,7 @@ const SearchBox = () => {
           onChange={(e) => setInputSearch(e.target.value)}
         />
       </div>
-      <List className="bg-white w-full p-5">
+      <List className="bg-white w-full p-0">
         {isLoading ? (
           <div className="w-full flex items-center justify-center">
             <Loader />

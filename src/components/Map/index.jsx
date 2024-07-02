@@ -6,6 +6,7 @@ import {
   ImageOverlay,
   Polygon,
   useMap,
+  useMapEvents,
 } from "react-leaflet";
 import "../../App.css";
 import "leaflet/dist/leaflet.css";
@@ -50,13 +51,33 @@ function ResetCenterView({ selectLocation }) {
   }, [selectLocation, map]);
 }
 
-export default function Map({ opacity, image }) {
+function ClickMap({setPosition}){
+  const map = useMapEvents({
+    click: (e) => {
+      console.log("Clicked at lat: ", e.latlng.lat, ", lng: ", e.latlng.lng);
+      setPosition([e.latlng.lat, e.latlng.lng]);
+    },
+  })
+}
+
+export default function Map({
+  opacity,
+  image,
+  mapRef,
+  scale,
+  position,
+  currentSize,
+  setPosition,
+}) {
   const { selectLocation, coordinates } = useLocation();
   const [polygon, setPolygon] = useState(null);
   const location = selectLocation
     ? [selectLocation.lat, selectLocation.lon]
     : center;
-
+  console.log("====================================");
+  console.log("position", position);
+  console.log(" currentSize", currentSize);
+  console.log("====================================");
   useEffect(() => {
     if (coordinates && coordinates.length > 0) {
       // Map coordinates to Leaflet format [lat, lng]
@@ -77,6 +98,7 @@ export default function Map({ opacity, image }) {
         zoom={12}
         scrollWheelZoom={true}
         style={{ height: "100%", width: "100%" }}
+        whenReady={(map) => (mapRef.current = map)}
       >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -92,10 +114,25 @@ export default function Map({ opacity, image }) {
         {polygon && <Polygon positions={polygon} />}
 
         {/* Render Image Overlay */}
-        <ImageOverlay url={image} bounds={imageBounds} opacity={opacity} />
-
+        {image && (
+          <ImageOverlay
+            url={image}
+            bounds={[
+              [
+                position[0] - (currentSize?.height / 2) * ratio * scale,
+                position[1] - (currentSize?.width / 2) * ratio * scale,
+              ],
+              [
+                position[0] + (currentSize?.height / 2) * ratio * scale,
+                position[1] + (currentSize?.width / 2) * ratio * scale,
+              ],
+            ]}
+            opacity={opacity}
+          />
+        )}
         {/* Component to reset map center view */}
         <ResetCenterView selectLocation={selectLocation} />
+        <ClickMap setPosition={setPosition} />
       </MapContainer>
     </div>
   );
