@@ -21,7 +21,7 @@ function App() {
   const [corners, setCorners] = useState({});
   const [mapZoom, setMapZoom] = useState(14);
 
-  const { selectLocation } = useLocation();
+  const { selectLocation, bounds } = useLocation();
 
   const mapRef = useRef();
   const imgRef = useRef();
@@ -378,6 +378,18 @@ function App() {
             </p>
             <p>
               Góc tây nam: {corners.sw.lat}, {corners.sw.lng}
+            </p>
+          </div>
+        )}
+
+        {bounds && (
+          <div className="">
+            <p className="text-red-400">Bounds image overlay - openstreetmap</p>
+            <p>
+              North (Bắc): Góc trên bên trái: {bounds[0][0]}, {bounds[0][1]}
+            </p>
+            <p>
+              South (Nam): Góc dưới bên phải: {bounds[1][0]}, {bounds[1][1]}
             </p>
           </div>
         )}

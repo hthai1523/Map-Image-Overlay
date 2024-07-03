@@ -69,9 +69,8 @@ export default function Map({
   currentSize,
   setPosition,
 }) {
-  const { selectLocation, coordinates } = useLocation();
+  const { selectLocation, coordinates, bounds, setBounds } = useLocation();
   const [polygon, setPolygon] = useState(null);
-  const [bounds, setBounds] = useState();
   const location = selectLocation
     ? [selectLocation.lat, selectLocation.lon]
     : center;
@@ -90,20 +89,21 @@ export default function Map({
   }, [coordinates]);
 
   useEffect(() => {
-    setBounds(() => [
-      [
-        position[0] - (currentSize?.height / 2) * ratio * scale,
-        position[1] - (currentSize?.width / 2) * ratio * scale,
-      ],
-      [
-        position[0] + (currentSize?.height / 2) * ratio * scale,
-        position[1] + (currentSize?.width / 2) * ratio * scale,
-      ],
-    ])
+    if(currentSize?.width !== 0 && currentSize?.height !== 0) {
+      setBounds(() => [
+        [
+          position[0] - (currentSize?.height / 2) * ratio * scale,
+          position[1] - (currentSize?.width / 2) * ratio * scale,
+        ],
+        [
+          position[0] + (currentSize?.height / 2) * ratio * scale,
+          position[1] + (currentSize?.width / 2) * ratio * scale,
+        ],
+      ])
+    }
   }, [currentSize?.height, currentSize?.width, position, scale])
-  
-  console.log(bounds);
 
+  
   return (
     <div className="w-full h-full">
       <MapContainer
@@ -127,7 +127,7 @@ export default function Map({
         {polygon && <Polygon positions={polygon} />}
 
         {/* Render Image Overlay */}
-        {image && (
+        {image && bounds && (
           <ImageOverlay
             url={image}
             bounds={bounds}

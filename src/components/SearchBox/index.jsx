@@ -70,7 +70,7 @@ const SearchBox = () => {
   };
 
   return (
-    <div className="absolute top-20 left-0 z-[99999] flex flex-col border-separate">
+    <div className="absolute top-20 left-0 z-[99999] flex gap-3 border-separate">
       <div className="size-fit flex items-center gap-4">
         <TextField
           id="outlined-password-input"
@@ -82,7 +82,7 @@ const SearchBox = () => {
           onChange={(e) => setInputSearch(e.target.value)}
         />
       </div>
-      <List className="bg-white w-full p-0">
+      <List className="bg-white w-full" sx={{padding: 0}}>
         {isLoading ? (
           <div className="w-full flex items-center justify-center">
             <Loader />

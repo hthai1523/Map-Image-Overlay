@@ -10,8 +10,9 @@ export function useLocation() {
 export const LocationProvider = ({children}) => {
   const [selectLocation, setSelectLocation] = useState(null);
   const [coordinates, setCoordinates] = useState([]);
+  const [bounds, setBounds] = useState(null);
 
-  const value = { selectLocation, setSelectLocation, coordinates, setCoordinates };
+  const value = { selectLocation, setSelectLocation, coordinates, setCoordinates, bounds, setBounds };
 
   return (
     <LocationContext.Provider value={value}>
