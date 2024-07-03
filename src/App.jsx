@@ -7,7 +7,8 @@ import { Button } from "@mui/material";
 import L from "leaflet";
 import Resizer from "react-image-file-resizer";
 import { useLocation } from "./context/locationContext";
-
+import base64StringToBlob from "./function/b64toBlob";
+import Loader from "./components/Loader";
 const initialCenter = [21.136663, 105.7473446];
 let ratio = 1 / 37350;
 
@@ -20,6 +21,7 @@ function App() {
   const [currentSize, setCurrentSize] = useState({ width: 0, height: 0 });
   const [corners, setCorners] = useState({});
   const [mapZoom, setMapZoom] = useState(14);
+  const [isLoading, setIsLoading] = useState(false);
 
   const { selectLocation, bounds } = useLocation();
 
@@ -41,29 +43,35 @@ function App() {
     }
   }, [selectLocation]);
 
-  const getImageSize = (file) => {
-    const reader = new FileReader();
-
-    reader.readAsDataURL(file);
-
+  const getImageSize = (input) => {
     return new Promise((resolve, reject) => {
+      let blob;
+      
+      if (typeof input === 'string') {
+        // If input is a base64 string, convert it to Blob
+        blob = base64StringToBlob(input);
+      } else if (input instanceof Blob) {
+        // If input is already a Blob, use it directly
+        blob = input;
+      } else {
+        reject(new Error("Invalid input type"));
+        return;
+      }
+  
+      const reader = new FileReader();
       reader.onload = function (e) {
         const image = new Image();
-
         image.src = e.target.result;
-
         image.onload = function () {
-          const height = this.height;
-          const width = this.width;
-
-          resolve({ width, height });
+          resolve({ width: this.width, height: this.height });
         };
-
         image.onerror = reject;
       };
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
     });
   };
-
+  
   const resizeImage = (file, width, height) => {
     return new Promise((resolve) => {
       Resizer.imageFileResizer(
@@ -80,32 +88,61 @@ function App() {
       );
     });
   };
-
+  
   const handleDrop = async (acceptedFiles) => {
     console.log(acceptedFiles);
     const file = acceptedFiles[0];
-    const imageDimension = await getImageSize(file);
-    console.log(
-      "imageDimension: " + imageDimension?.width + " " + imageDimension?.height
-    );
-    const resizedImage = await resizeImage(
-      file,
-      imageDimension?.width,
-      imageDimension?.height
-    );
-    console.log(resizedImage);
-
-    const img = new Image();
-    img.src = resizedImage;
-    img.onload = () => {
-      setImage(resizedImage);
-      setImageSize({
-        width: imageDimension?.width,
-        height: imageDimension?.height,
-      });
-      setCurrentSize({ width: img.width, height: img.height });
-    };
+  
+    if (file.size > 50000000) {
+      // Handle file upload without resizing
+        const img = new Image();
+        img.src = URL.createObjectURL(file);
+        console.log(img.src);
+        // img.onload = () => {
+        //   setImage(img);
+        //   setImageSize({
+        //     width: img?.width,
+        //     height: img?.height,
+        //   });
+        //   setCurrentSize({ width: img.width, height: img.height });
+        // };
+        // setIsLoading(false);
+      
+    } else {
+      // Handle file upload with resizing
+      try {
+        setIsLoading(true);
+        const resizedImage = await resizeImage(file);
+        console.log(".......");
+        console.log(resizedImage);
+  
+        const imageDimension = await getImageSize(resizedImage);
+        console.log(
+          "imageDimension: " +
+            imageDimension?.width +
+            " " +
+            imageDimension?.height
+        );
+  
+        const img = new Image();
+        img.src = resizedImage;
+        img.onload = () => {
+          setImage(resizedImage);
+          setImageSize({
+            width: imageDimension?.width,
+            height: imageDimension?.height,
+          });
+          setCurrentSize({ width: img.width, height: img.height });
+        };
+        setIsLoading(false);
+      } catch (error) {
+        console.log(error);
+        setIsLoading(false);
+      }
+    }
   };
+  
+  
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
@@ -227,7 +264,7 @@ function App() {
           onChange={(e) => setScale(e.target.value)}
         />
       </div>
-      <UploadImage onDrop={handleDrop} />
+      
       <Map
         opacity={opacity}
         image={image}
@@ -237,7 +274,16 @@ function App() {
         setPosition={setPosition}
         currentSize={currentSize}
       />
-      <SearchBox />
+     {
+      isLoading ? (
+        <div className="bg-white rounded-md flex items-center justify-center p-5 cursor-progress z-[99999] w-fit absolute top-0 left-0 "><Loader /></div>
+      ) : (
+        <>
+          <UploadImage onDrop={handleDrop} />
+          <SearchBox />
+        </>
+      )
+     }
       <form
         onSubmit={handleFormSubmit}
         className="size-fit absolute z-[99999] bottom-0 left-0 bg-white p-5 rounded-md space-y-2"

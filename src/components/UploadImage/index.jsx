@@ -3,13 +3,25 @@ import { useDropzone } from "react-dropzone";
 
 export default function UploadImage({onDrop}) {
   const handleDrop = useCallback(
-    (acceptedFiles) => {
+    (acceptedFiles, fileRejections) => {
       onDrop(acceptedFiles);
-    },
+      fileRejections.forEach((file) => {
+        file.errors.forEach((err) => {
+          if (err.code === "file-too-large") {
+            console.error(`Error: ${err.message}`);
+          }
+
+          if (err.code === "file-invalid-type") {
+            console.error(`Error: ${err.message}`);
+          }
+        });
+      });    },
     [onDrop]
   );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    maxSize: 70 * 1024 * 1024,
+    multiple: false,
     onDrop: handleDrop,
     accept: "image/*"
   });
