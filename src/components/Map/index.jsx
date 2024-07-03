@@ -17,8 +17,8 @@ import icon from "leaflet/dist/images/marker-icon.png";
 import iconShadow from "leaflet/dist/images/marker-shadow.png";
 
 const center = [21.130605906609222, 105.8270048137921];
-const widthImage = 10532.0;
-const heightImage = 7415.0;
+// const widthImage = 10532.0;
+// const heightImage = 7415.0;
 let ratio = 1 / 37350;
 
 // Set default marker icon
@@ -29,10 +29,10 @@ let DefaultIcon = L.icon({
 
 L.Marker.prototype.options.icon = DefaultIcon;
 
-const imageBounds = [
-  [center[0] - (heightImage / 2) * ratio, center[1] - (widthImage / 2) * ratio],
-  [center[0] + (heightImage / 2) * ratio, center[1] + (widthImage / 2) * ratio],
-];
+// const imageBounds = [
+//   [center[0] - (heightImage / 2) * ratio, center[1] - (widthImage / 2) * ratio],
+//   [center[0] + (heightImage / 2) * ratio, center[1] + (widthImage / 2) * ratio],
+// ];
 
 // Function component to reset map center view
 function ResetCenterView({ selectLocation }) {
@@ -51,13 +51,13 @@ function ResetCenterView({ selectLocation }) {
   }, [selectLocation, map]);
 }
 
-function ClickMap({setPosition}){
+function ClickMap({ setPosition }) {
   const map = useMapEvents({
     click: (e) => {
       console.log("Clicked at lat: ", e.latlng.lat, ", lng: ", e.latlng.lng);
       setPosition([e.latlng.lat, e.latlng.lng]);
     },
-  })
+  });
 }
 
 export default function Map({
@@ -71,13 +71,11 @@ export default function Map({
 }) {
   const { selectLocation, coordinates } = useLocation();
   const [polygon, setPolygon] = useState(null);
+  const [bounds, setBounds] = useState();
   const location = selectLocation
     ? [selectLocation.lat, selectLocation.lon]
     : center;
-  console.log("====================================");
-  console.log("position", position);
-  console.log(" currentSize", currentSize);
-  console.log("====================================");
+
   useEffect(() => {
     if (coordinates && coordinates.length > 0) {
       // Map coordinates to Leaflet format [lat, lng]
@@ -90,6 +88,21 @@ export default function Map({
       setPolygon(null); // Reset polygon if no coordinates
     }
   }, [coordinates]);
+
+  useEffect(() => {
+    setBounds(() => [
+      [
+        position[0] - (currentSize?.height / 2) * ratio * scale,
+        position[1] - (currentSize?.width / 2) * ratio * scale,
+      ],
+      [
+        position[0] + (currentSize?.height / 2) * ratio * scale,
+        position[1] + (currentSize?.width / 2) * ratio * scale,
+      ],
+    ])
+  }, [currentSize?.height, currentSize?.width, position, scale])
+  
+  console.log(bounds);
 
   return (
     <div className="w-full h-full">
@@ -117,21 +130,13 @@ export default function Map({
         {image && (
           <ImageOverlay
             url={image}
-            bounds={[
-              [
-                position[0] - (currentSize?.height / 2) * ratio * scale,
-                position[1] - (currentSize?.width / 2) * ratio * scale,
-              ],
-              [
-                position[0] + (currentSize?.height / 2) * ratio * scale,
-                position[1] + (currentSize?.width / 2) * ratio * scale,
-              ],
-            ]}
+            bounds={bounds}
             opacity={opacity}
           />
         )}
         {/* Component to reset map center view */}
         <ResetCenterView selectLocation={selectLocation} />
+        {/* Component click map */}
         <ClickMap setPosition={setPosition} />
       </MapContainer>
     </div>

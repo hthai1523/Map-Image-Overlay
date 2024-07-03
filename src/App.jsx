@@ -1,12 +1,13 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import "./App.css";
 import Map from "./components/Map";
-import mainImage from "./assets/anhmap.jpg";
 import SearchBox from "./components/SearchBox";
 import UploadImage from "./components/UploadImage";
 import { Button } from "@mui/material";
 import L from "leaflet";
-import Resizer from 'react-image-file-resizer'
+import Resizer from "react-image-file-resizer";
+import { useLocation } from "./context/locationContext";
+
 const initialCenter = [21.136663, 105.7473446];
 let ratio = 1 / 37350;
 
@@ -20,6 +21,8 @@ function App() {
   const [corners, setCorners] = useState({});
   const [mapZoom, setMapZoom] = useState(14);
 
+  const { selectLocation } = useLocation();
+
   const mapRef = useRef();
   const imgRef = useRef();
 
@@ -31,7 +34,13 @@ function App() {
     sw: { lat: "", lng: "" },
   });
   const [sizeInputs, setSizeInputs] = useState({ width: "", height: "" });
-  
+
+  useEffect(() => {
+    if (selectLocation && selectLocation?.lat && selectLocation?.lon) {
+      setPosition([selectLocation.lat, selectLocation.lon]);
+    }
+  }, [selectLocation]);
+
   const getImageSize = (file) => {
     const reader = new FileReader();
 
@@ -55,37 +64,45 @@ function App() {
     });
   };
 
-  const resizeImage = (file, width, height) =>
-    new Promise((resolve) => {
+  const resizeImage = (file, width, height) => {
+    return new Promise((resolve) => {
       Resizer.imageFileResizer(
         file,
-        4000,
-        4000,
+        10000,
+        10000,
         "JPEG",
         80,
         0,
         (uri) => {
           resolve(uri);
         },
-        "base64",
-        800,
-        800
+        "base64"
       );
     });
+  };
 
   const handleDrop = async (acceptedFiles) => {
     console.log(acceptedFiles);
     const file = acceptedFiles[0];
     const imageDimension = await getImageSize(file);
-    console.log("imageDimension: " + imageDimension?.width + " " + imageDimension?.height);
-    const resizedImage = await resizeImage(file, imageDimension?.width, imageDimension?.height);
+    console.log(
+      "imageDimension: " + imageDimension?.width + " " + imageDimension?.height
+    );
+    const resizedImage = await resizeImage(
+      file,
+      imageDimension?.width,
+      imageDimension?.height
+    );
+    console.log(resizedImage);
 
     const img = new Image();
     img.src = resizedImage;
-    console.log(resizedImage);
     img.onload = () => {
       setImage(resizedImage);
-      setImageSize({ width: img.width, height: img.height });
+      setImageSize({
+        width: imageDimension?.width,
+        height: imageDimension?.height,
+      });
       setCurrentSize({ width: img.width, height: img.height });
     };
   };
@@ -109,7 +126,7 @@ function App() {
 
   const handleFormSubmit = (event) => {
     event.preventDefault();
-    setPosition(centerInput);
+    setPosition([centerInput.lat, centerInput.lng]);
     setCorners({
       ne: L.latLng(cornerInputs.ne.lat, cornerInputs.ne.lng),
       nw: L.latLng(cornerInputs.nw.lat, cornerInputs.nw.lng),
@@ -189,7 +206,6 @@ function App() {
     return { ne, nw, se, sw };
   };
 
-
   return (
     <div className="relative w-screen h-screen">
       <div className="bg-white rounded-md size-fit p-5 flex flex-col absolute top-3 right-3 z-[999999]">
@@ -207,6 +223,7 @@ function App() {
           min={0}
           max={4}
           step={0.01}
+          value={scale}
           onChange={(e) => setScale(e.target.value)}
         />
       </div>
@@ -229,12 +246,14 @@ function App() {
           <label htmlFor="">Vi tri trung tam </label>
           <input
             type="number"
+            required
             name="center_lat"
             value={centerInput[0]}
             onChange={handleInputChange}
           />
           <input
             type="number"
+            required
             name="center_lng"
             value={centerInput[1]}
             onChange={handleInputChange}
@@ -244,6 +263,7 @@ function App() {
           <label>Góc đông bắc:</label>
           <input
             type="number"
+            required
             step="any"
             name="ne_lat"
             value={cornerInputs.ne.lat}
@@ -251,6 +271,7 @@ function App() {
           />
           <input
             type="number"
+            required
             step="any"
             name="ne_lng"
             value={cornerInputs.ne.lng}
@@ -261,6 +282,7 @@ function App() {
           <label>Góc tây bắc:</label>
           <input
             type="number"
+            required
             step="any"
             name="nw_lat"
             value={cornerInputs.nw.lat}
@@ -268,6 +290,7 @@ function App() {
           />
           <input
             type="number"
+            required
             step="any"
             name="nw_lng"
             value={cornerInputs.nw.lng}
@@ -278,6 +301,7 @@ function App() {
           <label>Góc đông nam:</label>
           <input
             type="number"
+            required
             step="any"
             name="se_lat"
             value={cornerInputs.se.lat}
@@ -285,6 +309,7 @@ function App() {
           />
           <input
             type="number"
+            required
             step="any"
             name="se_lng"
             value={cornerInputs.se.lng}
@@ -295,6 +320,7 @@ function App() {
           <label>Góc tây nam:</label>
           <input
             type="number"
+            required
             step="any"
             name="sw_lat"
             value={cornerInputs.sw.lat}
@@ -302,6 +328,7 @@ function App() {
           />
           <input
             type="number"
+            required
             step="any"
             name="sw_lng"
             value={cornerInputs.sw.lng}
@@ -312,12 +339,14 @@ function App() {
           <label>Kích thước ảnh (width x height): </label>
           <input
             type="number"
+            required
             name="size_width"
             value={sizeInputs.width}
             onChange={handleInputChange}
           />
           <input
             type="number"
+            required
             name="size_height"
             value={sizeInputs.height}
             onChange={handleInputChange}

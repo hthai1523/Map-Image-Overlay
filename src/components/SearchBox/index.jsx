@@ -11,7 +11,7 @@ import { useLocation } from "../../context/locationContext";
 import axios from "axios";
 import { useDebounce } from 'use-debounce';
 import Loader from "../Loader";
-import marker from '../../assets/marker.jpg'
+import marker from '../../assets/marker.jpg';
 
 const NOMINATIM_BASE_URL = "https://nominatim.openstreetmap.org/search?";
 const params = {
@@ -60,11 +60,13 @@ const SearchBox = () => {
   }, [debouncedInputSearch]);
 
   const handleItemClick = (item) => {
-    setSelectLocation(item);
+    setSelectLocation({
+      lat: parseFloat(item.lat),
+      lon: parseFloat(item.lon),
+    });
     if (item?.geojson?.coordinates) {
       setCoordinates(item?.geojson?.coordinates);
     }
-    
   };
 
   return (
