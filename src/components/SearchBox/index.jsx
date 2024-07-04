@@ -9,9 +9,9 @@ import {
 } from "@mui/material";
 import { useLocation } from "../../context/locationContext";
 import axios from "axios";
-import { useDebounce } from 'use-debounce';
+import { useDebounce } from "use-debounce";
 import Loader from "../Loader";
-import marker from '../../assets/marker.jpg';
+import marker from "../../assets/marker.jpg";
 
 const NOMINATIM_BASE_URL = "https://nominatim.openstreetmap.org/search?";
 const params = {
@@ -70,7 +70,7 @@ const SearchBox = () => {
   };
 
   return (
-    <div className="absolute top-20 left-0 z-[99999] flex gap-3 border-separate">
+    <div className="absolute top-20 left-0 z-[9999999] flex gap-3 border-separate">
       <div className="size-fit flex items-center gap-4">
         <TextField
           id="outlined-password-input"
@@ -82,7 +82,7 @@ const SearchBox = () => {
           onChange={(e) => setInputSearch(e.target.value)}
         />
       </div>
-      <List className="bg-white w-full" sx={{padding: 0}}>
+      <List className="bg-white w-full" sx={{ padding: 0 }}>
         {isLoading ? (
           <div className="w-full flex items-center justify-center">
             <Loader />
@@ -96,12 +96,8 @@ const SearchBox = () => {
                 handleItemClick(item);
               }}
             >
-              <ListItemIcon>
-                <img
-                  src={marker}
-                  alt="marker"
-                  className="size-10"
-                />
+              <ListItemIcon className="size-10 z-[99999999]">
+                <img src={marker} alt="marker" />
               </ListItemIcon>
               <ListItemText primary={item.display_name} />
             </ListItem>
