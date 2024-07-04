@@ -71,20 +71,24 @@ function App() {
       reader.readAsDataURL(blob);
     });
   };
-  
-  const resizeImage = (file, width, height) => {
-    return new Promise((resolve) => {
+  const resizeImage = (file, maxWidth, maxHeight) => {
+    return new Promise((resolve, reject) => {
       Resizer.imageFileResizer(
         file,
-        10000,
-        10000,
-        "JPEG",
+        maxWidth,
+        maxHeight,
+        'JPEG',
         80,
         0,
         (uri) => {
           resolve(uri);
         },
-        "base64"
+        'base64',
+        undefined,
+        undefined,
+        (error) => {
+          reject(error);
+        }
       );
     });
   };
@@ -93,26 +97,11 @@ function App() {
     console.log(acceptedFiles);
     const file = acceptedFiles[0];
   
-    if (file.size > 50000000) {
-      // Handle file upload without resizing
-        const img = new Image();
-        img.src = URL.createObjectURL(file);
-        console.log(img.src);
-        // img.onload = () => {
-        //   setImage(img);
-        //   setImageSize({
-        //     width: img?.width,
-        //     height: img?.height,
-        //   });
-        //   setCurrentSize({ width: img.width, height: img.height });
-        // };
-        // setIsLoading(false);
-      
-    } else {
+   
       // Handle file upload with resizing
       try {
         setIsLoading(true);
-        const resizedImage = await resizeImage(file);
+        const resizedImage = await resizeImage(file, 10000, 10000);
         console.log(".......");
         console.log(resizedImage);
   
@@ -139,7 +128,7 @@ function App() {
         console.log(error);
         setIsLoading(false);
       }
-    }
+    
   };
   
   

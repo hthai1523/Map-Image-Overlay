@@ -74,7 +74,6 @@ export default function Map({
   const location = selectLocation
     ? [selectLocation.lat, selectLocation.lon]
     : center;
-
   useEffect(() => {
     if (coordinates && coordinates.length > 0) {
       // Map coordinates to Leaflet format [lat, lng]
@@ -132,6 +131,7 @@ export default function Map({
             url={image}
             bounds={bounds}
             opacity={opacity}
+            
           />
         )}
         {/* Component to reset map center view */}
