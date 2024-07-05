@@ -10,7 +10,7 @@ import { useLocation } from "./context/locationContext";
 import base64StringToBlob from "./function/b64toBlob";
 import Loader from "./components/Loader";
 const initialCenter = [21.136663, 105.7473446];
-let ratio = 1 / 37350;
+let ratio = 1 / 25000;
 
 function App() {
   const [image, setImage] = useState(null);
@@ -46,8 +46,8 @@ function App() {
   const getImageSize = (input) => {
     return new Promise((resolve, reject) => {
       let blob;
-      
-      if (typeof input === 'string') {
+
+      if (typeof input === "string") {
         // If input is a base64 string, convert it to Blob
         blob = base64StringToBlob(input);
       } else if (input instanceof Blob) {
@@ -57,7 +57,7 @@ function App() {
         reject(new Error("Invalid input type"));
         return;
       }
-  
+
       const reader = new FileReader();
       reader.onload = function (e) {
         const image = new Image();
@@ -71,19 +71,20 @@ function App() {
       reader.readAsDataURL(blob);
     });
   };
-  const resizeImage = (file, maxWidth, maxHeight) => {
+
+  const resizeImage = (file, width, height) => {
     return new Promise((resolve, reject) => {
       Resizer.imageFileResizer(
         file,
-        maxWidth,
-        maxHeight,
-        'JPEG',
-        80,
+        width,
+        height,
+        "JPEG",
+        100,
         0,
         (uri) => {
           resolve(uri);
         },
-        'base64',
+        "base64",
         undefined,
         undefined,
         (error) => {
@@ -92,46 +93,82 @@ function App() {
       );
     });
   };
-  
+
   const handleDrop = async (acceptedFiles) => {
-    console.log(acceptedFiles);
-    const file = acceptedFiles[0];
-  
-   
-      // Handle file upload with resizing
-      try {
-        setIsLoading(true);
-        const resizedImage = await resizeImage(file, 10000, 10000);
-        console.log(".......");
-        console.log(resizedImage);
-  
-        const imageDimension = await getImageSize(resizedImage);
-        console.log(
-          "imageDimension: " +
-            imageDimension?.width +
-            " " +
-            imageDimension?.height
-        );
-  
-        const img = new Image();
-        img.src = resizedImage;
-        img.onload = () => {
-          setImage(resizedImage);
-          setImageSize({
-            width: imageDimension?.width,
-            height: imageDimension?.height,
-          });
-          setCurrentSize({ width: img.width, height: img.height });
-        };
-        setIsLoading(false);
-      } catch (error) {
-        console.log(error);
-        setIsLoading(false);
-      }
-    
+    // console.log(acceptedFiles);
+    // const file = acceptedFiles[0];
+    // try {
+    //   setIsLoading(true);
+    //   // Get the original dimensions of the image
+    //   const imageDimension = await getImageSize(file);
+    //   console.log(
+    //     "Original imageDimension: " +
+    //       imageDimension?.width +
+    //       " " +
+    //       imageDimension?.height
+    //   );
+    //   // Calculate half dimensions
+    //   const halfWidth = imageDimension.width / 2;
+    //   const halfHeight = imageDimension.height / 2;
+    //   console.log("half width: " + halfWidth + " half height: " + halfHeight);
+    //   // Resize the image to half its original dimensions
+    //   const resizedImage = await resizeImage(file, halfWidth, halfHeight);
+    //   console.log("Resized image: ", resizedImage);
+    //   const img = new Image();
+    //   img.src = resizedImage;
+    //   img.onload = () => {
+    //     setImage(resizedImage);
+    //     setImageSize({
+    //       width: img.width,
+    //       height: img.height,
+    //     });
+    //     setCurrentSize({ width: img.width, height: img.height });
+    //   };
+    //   setIsLoading(false);
+    // } catch (error) {
+    //   console.log(error);
+    //   setIsLoading(false);
+    // }
   };
-  
-  
+
+  const handleInputFileChange = async (e) => {
+    const file = e.target.files[0];
+    console.log("File", file);
+    if (!file) return;
+
+    const validImageTypes = ["image/jpeg", "image/png", "image/gif"];
+
+    if (!validImageTypes.includes(file.type)) {
+      console.error("Invalid file type. Please select an image file.");
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+
+      const img = new Image();
+      img.onload = () => {
+        URL.revokeObjectURL(img.src);
+        setImage(img);
+        setImageSize({
+          width: img.width,
+          height: img.height,
+        });
+        setCurrentSize({ width: img.width, height: img.height });
+        setIsLoading(false);
+      };
+
+      img.onerror = (error) => {
+        console.error("Error loading image:", error);
+        setIsLoading(false);
+      };
+
+      img.src = URL.createObjectURL(file);
+    } catch (error) {
+      console.log(error);
+      setIsLoading(false);
+    }
+  };
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
@@ -148,21 +185,60 @@ function App() {
         [section]: { ...cornerInputs[section], [coord]: parseFloat(value) },
       });
     }
+
+    // Calculate new currentSize based on scale and input changes
+    setCurrentSize((prev) => {
+      return {
+        width: sizeInputs.width || prev.width,
+        height: sizeInputs.height || prev.height,
+      };
+    });
+    console.log("current size: " + currentSize.width);
   };
 
   const handleFormSubmit = (event) => {
     event.preventDefault();
-    setPosition([centerInput.lat, centerInput.lng]);
+
+    // Use previous values if the current input is empty
+    const updatedCenter = {
+      lat: centerInput.lat || position[0],
+      lng: centerInput.lng || position[1],
+    };
+
+    const updatedCorners = {
+      ne: {
+        lat: cornerInputs.ne.lat || corners.ne.lat,
+        lng: cornerInputs.ne.lng || corners.ne.lng,
+      },
+      nw: {
+        lat: cornerInputs.nw.lat || corners.nw.lat,
+        lng: cornerInputs.nw.lng || corners.nw.lng,
+      },
+      se: {
+        lat: cornerInputs.se.lat || corners.se.lat,
+        lng: cornerInputs.se.lng || corners.se.lng,
+      },
+      sw: {
+        lat: cornerInputs.sw.lat || corners.sw.lat,
+        lng: cornerInputs.sw.lng || corners.sw.lng,
+      },
+    };
+
+    const updatedSize = {
+      width: sizeInputs.width || currentSize.width,
+      height: sizeInputs.height || currentSize.height,
+    };
+
+    setPosition([updatedCenter.lat, updatedCenter.lng]);
     setCorners({
-      ne: L.latLng(cornerInputs.ne.lat, cornerInputs.ne.lng),
-      nw: L.latLng(cornerInputs.nw.lat, cornerInputs.nw.lng),
-      se: L.latLng(cornerInputs.se.lat, cornerInputs.se.lng),
-      sw: L.latLng(cornerInputs.sw.lat, cornerInputs.sw.lng),
+      ne: L.latLng(updatedCorners.ne.lat, updatedCorners.ne.lng),
+      nw: L.latLng(updatedCorners.nw.lat, updatedCorners.nw.lng),
+      se: L.latLng(updatedCorners.se.lat, updatedCorners.se.lng),
+      sw: L.latLng(updatedCorners.sw.lat, updatedCorners.sw.lng),
     });
-    setImageSize(sizeInputs);
     setCurrentSize({
-      width: sizeInputs.width * scale,
-      height: sizeInputs.height * scale,
+      width: updatedSize.width * scale,
+      height: updatedSize.height * scale,
     });
   };
 
@@ -191,22 +267,20 @@ function App() {
   }, [scale, imageSize]);
 
   useEffect(() => {
-    if (mapRef.current && imageSize.width && imageSize.height) {
+    if (position && currentSize.width && currentSize.height) {
       const bounds = calculateImageBounds(position, currentSize);
       setCorners(bounds);
     }
-  }, [position, currentSize, imageSize]);
+  }, [position, currentSize]);
 
   useEffect(() => {
-    if (mapRef.current) {
-      const map = mapRef.current;
-      const zoomScale = Math.pow(2, mapZoom - 14);
+    if (imageSize.width && imageSize.height) {
       setCurrentSize({
-        width: imageSize.width * scale * zoomScale,
-        height: imageSize.height * scale * zoomScale,
+        width: imageSize.width * scale,
+        height: imageSize.height * scale,
       });
     }
-  }, [mapZoom, scale, imageSize]);
+  }, [scale, imageSize]);
 
   const calculateImageBounds = (center, size) => {
     const halfWidth = size.width / 2;
@@ -252,8 +326,9 @@ function App() {
           value={scale}
           onChange={(e) => setScale(e.target.value)}
         />
+        <input type="file" onChange={(e) => handleInputFileChange(e)} />
       </div>
-      
+
       <Map
         opacity={opacity}
         image={image}
@@ -263,16 +338,16 @@ function App() {
         setPosition={setPosition}
         currentSize={currentSize}
       />
-     {
-      isLoading ? (
-        <div className="bg-white rounded-md flex items-center justify-center p-5 cursor-progress z-[99999] w-fit absolute top-0 left-0 "><Loader /></div>
+      {isLoading ? (
+        <div className="bg-white rounded-md flex items-center justify-center p-5 cursor-progress z-[99999] w-fit absolute top-0 left-0 ">
+          <Loader />
+        </div>
       ) : (
         <>
-          <UploadImage onDrop={handleDrop} />
+          {/* <UploadImage onDrop={handleDrop} /> */}
           <SearchBox />
         </>
-      )
-     }
+      )}
       <form
         onSubmit={handleFormSubmit}
         className="size-fit absolute z-[99999] bottom-0 left-0 bg-white p-5 rounded-md space-y-2"
@@ -281,24 +356,23 @@ function App() {
           <label htmlFor="">Vi tri trung tam </label>
           <input
             type="number"
-            required
             name="center_lat"
-            value={centerInput[0]}
+            value={centerInput.lat}
             onChange={handleInputChange}
+            step="any"
           />
           <input
             type="number"
-            required
             name="center_lng"
-            value={centerInput[1]}
+            value={centerInput.lng}
             onChange={handleInputChange}
+            step="any"
           />
         </div>
         <div>
           <label>Góc đông bắc:</label>
           <input
             type="number"
-            required
             step="any"
             name="ne_lat"
             value={cornerInputs.ne.lat}
@@ -306,7 +380,6 @@ function App() {
           />
           <input
             type="number"
-            required
             step="any"
             name="ne_lng"
             value={cornerInputs.ne.lng}
@@ -317,7 +390,6 @@ function App() {
           <label>Góc tây bắc:</label>
           <input
             type="number"
-            required
             step="any"
             name="nw_lat"
             value={cornerInputs.nw.lat}
@@ -325,7 +397,6 @@ function App() {
           />
           <input
             type="number"
-            required
             step="any"
             name="nw_lng"
             value={cornerInputs.nw.lng}
@@ -336,7 +407,6 @@ function App() {
           <label>Góc đông nam:</label>
           <input
             type="number"
-            required
             step="any"
             name="se_lat"
             value={cornerInputs.se.lat}
@@ -344,7 +414,6 @@ function App() {
           />
           <input
             type="number"
-            required
             step="any"
             name="se_lng"
             value={cornerInputs.se.lng}
@@ -355,7 +424,6 @@ function App() {
           <label>Góc tây nam:</label>
           <input
             type="number"
-            required
             step="any"
             name="sw_lat"
             value={cornerInputs.sw.lat}
@@ -363,7 +431,6 @@ function App() {
           />
           <input
             type="number"
-            required
             step="any"
             name="sw_lng"
             value={cornerInputs.sw.lng}
@@ -374,15 +441,15 @@ function App() {
           <label>Kích thước ảnh (width x height): </label>
           <input
             type="number"
-            required
             name="size_width"
+            step="any"
             value={sizeInputs.width}
             onChange={handleInputChange}
           />
           <input
             type="number"
-            required
             name="size_height"
+            step="any"
             value={sizeInputs.height}
             onChange={handleInputChange}
           />
@@ -395,7 +462,7 @@ function App() {
           Kích thước ban đầu: {imageSize.width} x {imageSize.height}
         </p>
         <p>
-          Kích thước hiện tại: {currentSize.width} x {currentSize.height}
+          Kích thước hiện tại: {parseInt(currentSize.width)} x {parseInt(currentSize.height)}
         </p>
         <p>
           Vị trí trung tâm: {position[0]}, {position[1]}

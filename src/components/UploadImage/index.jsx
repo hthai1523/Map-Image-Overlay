@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 import { useDropzone } from "react-dropzone";
 
-export default function UploadImage({onDrop}) {
+export default function UploadImage({ onDrop }) {
   const handleDrop = useCallback(
     (acceptedFiles, fileRejections) => {
       onDrop(acceptedFiles);
@@ -15,7 +15,8 @@ export default function UploadImage({onDrop}) {
             console.error(`Error: ${err.message}`);
           }
         });
-      });    },
+      });
+    },
     [onDrop]
   );
 
@@ -23,7 +24,7 @@ export default function UploadImage({onDrop}) {
     maxSize: 70 * 1024 * 1024,
     multiple: false,
     onDrop: handleDrop,
-    accept: "image/*"
+    accept: "image/*",
   });
 
   return (

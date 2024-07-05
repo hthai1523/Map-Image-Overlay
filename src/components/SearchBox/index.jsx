@@ -60,6 +60,7 @@ const SearchBox = () => {
   }, [debouncedInputSearch]);
 
   const handleItemClick = (item) => {
+    console.log("item", item);
     setSelectLocation({
       lat: parseFloat(item.lat),
       lon: parseFloat(item.lon),
@@ -67,6 +68,7 @@ const SearchBox = () => {
     if (item?.geojson?.coordinates) {
       setCoordinates(item?.geojson?.coordinates);
     }
+    setInputSearch("");
   };
 
   return (

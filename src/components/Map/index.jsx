@@ -19,7 +19,8 @@ import iconShadow from "leaflet/dist/images/marker-shadow.png";
 const center = [21.130605906609222, 105.8270048137921];
 // const widthImage = 10532.0;
 // const heightImage = 7415.0;
-let ratio = 1 / 37350;
+let ratio = 1 / 25000;
+
 
 // Set default marker icon
 let DefaultIcon = L.icon({
@@ -74,6 +75,8 @@ export default function Map({
   const location = selectLocation
     ? [selectLocation.lat, selectLocation.lon]
     : center;
+
+
   useEffect(() => {
     if (coordinates && coordinates.length > 0) {
       // Map coordinates to Leaflet format [lat, lng]
