@@ -21,7 +21,6 @@ const center = [21.130605906609222, 105.8270048137921];
 // const heightImage = 7415.0;
 let ratio = 1 / 25000;
 
-
 // Set default marker icon
 let DefaultIcon = L.icon({
   iconUrl: icon,
@@ -75,7 +74,15 @@ export default function Map({
   const location = selectLocation
     ? [selectLocation.lat, selectLocation.lon]
     : center;
+  const [boundingbox, setBoundingBox] = useState();
 
+  useEffect(() => {
+    selectLocation?.boundingbox &&
+      setBoundingBox([
+        [selectLocation?.boundingbox[0], selectLocation?.boundingbox[2]],
+        [selectLocation?.boundingbox[1], selectLocation?.boundingbox[3]],
+      ]);
+  }, [selectLocation?.boundingbox]);
 
   useEffect(() => {
     if (coordinates && coordinates.length > 0) {
@@ -90,22 +97,21 @@ export default function Map({
     }
   }, [coordinates]);
 
-  useEffect(() => {
-    if(currentSize?.width !== 0 && currentSize?.height !== 0) {
-      setBounds(() => [
-        [
-          position[0] - (currentSize?.height / 2) * ratio * scale,
-          position[1] - (currentSize?.width / 2) * ratio * scale,
-        ],
-        [
-          position[0] + (currentSize?.height / 2) * ratio * scale,
-          position[1] + (currentSize?.width / 2) * ratio * scale,
-        ],
-      ])
-    }
-  }, [currentSize?.height, currentSize?.width, position, scale])
+  // useEffect(() => {
+  //   if (currentSize?.width !== 0 && currentSize?.height !== 0) {
+  //     setBounds(() => [
+  //       [
+  //         position[0] - (currentSize?.height / 2) * ratio * scale,
+  //         position[1] - (currentSize?.width / 2) * ratio * scale,
+  //       ],
+  //       [
+  //         position[0] + (currentSize?.height / 2) * ratio * scale,
+  //         position[1] + (currentSize?.width / 2) * ratio * scale,
+  //       ],
+  //     ]);
+  //   }
+  // }, [currentSize?.height, currentSize?.width, position, scale]);
 
-  
   return (
     <div className="w-full h-full">
       <MapContainer
@@ -129,18 +135,13 @@ export default function Map({
         {polygon && <Polygon positions={polygon} />}
 
         {/* Render Image Overlay */}
-        {image && bounds && (
-          <ImageOverlay
-            url={image}
-            bounds={bounds}
-            opacity={opacity}
-            
-          />
+        {image && boundingbox && (
+          <ImageOverlay url={image} bounds={boundingbox} opacity={opacity} style={{overFlow: 'hidden'}} />
         )}
         {/* Component to reset map center view */}
         <ResetCenterView selectLocation={selectLocation} />
         {/* Component click map */}
-        <ClickMap setPosition={setPosition} />
+        {/* <ClickMap setPosition={setPosition} /> */}
       </MapContainer>
     </div>
   );

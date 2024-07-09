@@ -12,7 +12,7 @@ import axios from "axios";
 import { useDebounce } from "use-debounce";
 import Loader from "../Loader";
 import marker from "../../assets/marker.jpg";
-
+import {getDistance} from 'geolib'
 const NOMINATIM_BASE_URL = "https://nominatim.openstreetmap.org/search?";
 const params = {
   format: "json",
@@ -25,6 +25,8 @@ const SearchBox = () => {
   const [debouncedInputSearch] = useDebounce(inputSearch, 500);
   const [listPlace, setListPlace] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [width, setWidth] = useState(0);
+  const [height, setHeight] = useState(0);
 
   const { setSelectLocation, setCoordinates } = useLocation();
 
@@ -59,17 +61,42 @@ const SearchBox = () => {
     handleGetData();
   }, [debouncedInputSearch]);
 
+  const calculateDimensions = (boundingBox) => {
+    const [minLat, maxLat, minLng, maxLng] = boundingBox.map(coord => parseFloat(coord));
+
+    // Tính chiều rộng (khoảng cách giữa minLng và maxLng tại cùng vĩ độ)
+    const width = getDistance(
+      { latitude: minLat, longitude: minLng },
+      { latitude: minLat, longitude: maxLng }
+    );
+
+    // Tính chiều cao (khoảng cách giữa minLat và maxLat tại cùng kinh độ)
+    const height = getDistance(
+      { latitude: minLat, longitude: minLng },
+      { latitude: maxLat, longitude: minLng }
+    );
+
+    setWidth(width);
+    setHeight(height);
+    console.log('====================================');
+    console.log(width, height);
+    console.log('====================================');
+  };
+
   const handleItemClick = (item) => {
     console.log("item", item);
     setSelectLocation({
       lat: parseFloat(item.lat),
       lon: parseFloat(item.lon),
+      boundingbox: item.boundingbox
     });
+    calculateDimensions(item.boundingbox);
     if (item?.geojson?.coordinates) {
       setCoordinates(item?.geojson?.coordinates);
     }
     setInputSearch("");
   };
+
 
   return (
     <div className="absolute top-20 left-0 z-[9999999] flex gap-3 border-separate">

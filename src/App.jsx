@@ -43,56 +43,56 @@ function App() {
     }
   }, [selectLocation]);
 
-  const getImageSize = (input) => {
-    return new Promise((resolve, reject) => {
-      let blob;
+  // const getImageSize = (input) => {
+  //   return new Promise((resolve, reject) => {
+  //     let blob;
 
-      if (typeof input === "string") {
-        // If input is a base64 string, convert it to Blob
-        blob = base64StringToBlob(input);
-      } else if (input instanceof Blob) {
-        // If input is already a Blob, use it directly
-        blob = input;
-      } else {
-        reject(new Error("Invalid input type"));
-        return;
-      }
+  //     if (typeof input === "string") {
+  //       // If input is a base64 string, convert it to Blob
+  //       blob = base64StringToBlob(input);
+  //     } else if (input instanceof Blob) {
+  //       // If input is already a Blob, use it directly
+  //       blob = input;
+  //     } else {
+  //       reject(new Error("Invalid input type"));
+  //       return;
+  //     }
 
-      const reader = new FileReader();
-      reader.onload = function (e) {
-        const image = new Image();
-        image.src = e.target.result;
-        image.onload = function () {
-          resolve({ width: this.width, height: this.height });
-        };
-        image.onerror = reject;
-      };
-      reader.onerror = reject;
-      reader.readAsDataURL(blob);
-    });
-  };
+  //     const reader = new FileReader();
+  //     reader.onload = function (e) {
+  //       const image = new Image();
+  //       image.src = e.target.result;
+  //       image.onload = function () {
+  //         resolve({ width: this.width, height: this.height });
+  //       };
+  //       image.onerror = reject;
+  //     };
+  //     reader.onerror = reject;
+  //     reader.readAsDataURL(blob);
+  //   });
+  // };
 
-  const resizeImage = (file, width, height) => {
-    return new Promise((resolve, reject) => {
-      Resizer.imageFileResizer(
-        file,
-        width,
-        height,
-        "JPEG",
-        100,
-        0,
-        (uri) => {
-          resolve(uri);
-        },
-        "base64",
-        undefined,
-        undefined,
-        (error) => {
-          reject(error);
-        }
-      );
-    });
-  };
+  // const resizeImage = (file, width, height) => {
+  //   return new Promise((resolve, reject) => {
+  //     Resizer.imageFileResizer(
+  //       file,
+  //       width,
+  //       height,
+  //       "JPEG",
+  //       100,
+  //       0,
+  //       (uri) => {
+  //         resolve(uri);
+  //       },
+  //       "base64",
+  //       undefined,
+  //       undefined,
+  //       (error) => {
+  //         reject(error);
+  //       }
+  //     );
+  //   });
+  // };
 
   const handleDrop = async (acceptedFiles) => {
     // console.log(acceptedFiles);
@@ -317,15 +317,15 @@ function App() {
           step={0.01}
           onChange={(e) => setOpacity(e.target.value)}
         />
-        <label htmlFor="">Change Scale</label>
-        <input
+        {/* <label htmlFor="">Change Scale</label> */}
+        {/* <input
           type="range"
           min={0}
           max={4}
           step={0.01}
           value={scale}
           onChange={(e) => setScale(e.target.value)}
-        />
+        /> */}
         <input type="file" onChange={(e) => handleInputFileChange(e)} />
       </div>
 
@@ -484,14 +484,14 @@ function App() {
           </div>
         )}
 
-        {bounds && (
+        {selectLocation?.boundingbox && (
           <div className="">
             <p className="text-red-400">Bounds image overlay - openstreetmap</p>
             <p>
-              North (Bắc): Góc trên bên trái: {bounds[0][0]}, {bounds[0][1]}
+              North (Bắc): Góc trên bên trái: {selectLocation?.boundingbox[0]}, {selectLocation?.boundingbox[2]}
             </p>
             <p>
-              South (Nam): Góc dưới bên phải: {bounds[1][0]}, {bounds[1][1]}
+              South (Nam): Góc dưới bên phải: {selectLocation?.boundingbox[1]}, {selectLocation?.boundingbox[3]}
             </p>
           </div>
         )}
