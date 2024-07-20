@@ -75,14 +75,14 @@ export default function Map({
     ? [selectLocation.lat, selectLocation.lon]
     : center;
   const [boundingbox, setBoundingBox] = useState();
-
   useEffect(() => {
     selectLocation?.boundingbox &&
-      setBoundingBox([
-        [selectLocation?.boundingbox[0], selectLocation?.boundingbox[2]],
-        [selectLocation?.boundingbox[1], selectLocation?.boundingbox[3]],
-      ]);
+    setBoundingBox([
+      [selectLocation?.boundingbox[0], selectLocation?.boundingbox[2]],
+      [selectLocation?.boundingbox[1], selectLocation?.boundingbox[3]],
+    ]);
   }, [selectLocation?.boundingbox]);
+  console.log(boundingbox)
 
   useEffect(() => {
     if (coordinates && coordinates.length > 0) {
@@ -122,9 +122,10 @@ export default function Map({
         whenReady={(map) => (mapRef.current = map)}
       >
         <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
+        url="http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}"
+        attribution='&copy; <a href="https://maps.google.com">Google Maps</a> contributors'
+        subdomains={['mt0', 'mt1', 'mt2', 'mt3']}
+      />
 
         {/* Render Marker with Popup */}
         <Marker position={location}>

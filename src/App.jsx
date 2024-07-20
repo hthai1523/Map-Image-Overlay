@@ -135,17 +135,18 @@ function App() {
     const file = e.target.files[0];
     console.log("File", file);
     if (!file) return;
-
-    const validImageTypes = ["image/jpeg", "image/png", "image/gif"];
-
+  
+    // Include 'image/webp' in the list of valid image types
+    const validImageTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"];
+  
     if (!validImageTypes.includes(file.type)) {
       console.error("Invalid file type. Please select an image file.");
       return;
     }
-
+  
     try {
       setIsLoading(true);
-
+  
       const img = new Image();
       img.onload = () => {
         URL.revokeObjectURL(img.src);
@@ -157,18 +158,19 @@ function App() {
         setCurrentSize({ width: img.width, height: img.height });
         setIsLoading(false);
       };
-
+  
       img.onerror = (error) => {
         console.error("Error loading image:", error);
         setIsLoading(false);
       };
-
+  
       img.src = URL.createObjectURL(file);
     } catch (error) {
       console.log(error);
       setIsLoading(false);
     }
   };
+  
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
