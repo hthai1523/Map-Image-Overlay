@@ -7,6 +7,7 @@ import {
   Polygon,
   useMap,
   useMapEvents,
+  Pane,
 } from "react-leaflet";
 import "../../App.css";
 import "leaflet/dist/leaflet.css";
@@ -77,12 +78,12 @@ export default function Map({
   const [boundingbox, setBoundingBox] = useState();
   useEffect(() => {
     selectLocation?.boundingbox &&
-    setBoundingBox([
-      [selectLocation?.boundingbox[0], selectLocation?.boundingbox[2]],
-      [selectLocation?.boundingbox[1], selectLocation?.boundingbox[3]],
-    ]);
+      setBoundingBox([
+        [selectLocation?.boundingbox[0], selectLocation?.boundingbox[2]],
+        [selectLocation?.boundingbox[1], selectLocation?.boundingbox[3]],
+      ]);
   }, [selectLocation?.boundingbox]);
-  console.log(boundingbox)
+  console.log(boundingbox);
 
   useEffect(() => {
     if (coordinates && coordinates.length > 0) {
@@ -122,10 +123,21 @@ export default function Map({
         whenReady={(map) => (mapRef.current = map)}
       >
         <TileLayer
-        url="http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}"
-        attribution='&copy; <a href="https://maps.google.com">Google Maps</a> contributors'
-        subdomains={['mt0', 'mt1', 'mt2', 'mt3']}
-      />
+          url="http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}"
+          attribution='&copy; <a href="https://maps.google.com">Google Maps</a> contributors'
+          subdomains={["mt0", "mt1", "mt2", "mt3"]}
+        />
+        <Pane name="PaneThai" style={{ zIndex: 650 }}>
+          {/* <TileLayer url={"https://apilandinvest.gachmen.org/get_image_landinvest/{z}/{x}/{y}"} pane="overlayPane" minZoom={10} maxZoom={30} maxNativeZoom={30} opacity={opacity} /> */}
+          <TileLayer
+            url={'https://han01.vstorage.vngcloud.vn/v1/AUTH_1dbb06310d21466fa9693a9d20fc3965/guland/hoa-binh-2030/{z}/{x}/{y}.png'}
+            pane="overlayPane"
+            minZoom={10}
+            maxZoom={30}
+            maxNativeZoom={30}
+            opacity={opacity}
+          />
+        </Pane>
 
         {/* Render Marker with Popup */}
         <Marker position={location}>
@@ -137,7 +149,12 @@ export default function Map({
 
         {/* Render Image Overlay */}
         {image && boundingbox && (
-          <ImageOverlay url={image} bounds={boundingbox} opacity={opacity} style={{overFlow: 'hidden'}} />
+          <ImageOverlay
+            url={image}
+            bounds={boundingbox}
+            opacity={opacity}
+            style={{ overFlow: "hidden" }}
+          />
         )}
         {/* Component to reset map center view */}
         <ResetCenterView selectLocation={selectLocation} />
