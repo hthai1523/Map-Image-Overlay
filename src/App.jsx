@@ -350,7 +350,7 @@ function App() {
           <SearchBox />
         </>
       )}
-      <form
+      {/* <form
         onSubmit={handleFormSubmit}
         className="size-fit absolute z-[99999] bottom-0 left-0 bg-white p-5 rounded-md space-y-2"
       >
@@ -497,7 +497,7 @@ function App() {
             </p>
           </div>
         )}
-      </form>
+      </form> */}
     </div>
   );
 }

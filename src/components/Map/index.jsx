@@ -122,20 +122,20 @@ export default function Map({
         style={{ height: "100%", width: "100%" }}
         whenReady={(map) => (mapRef.current = map)}
       >
-        <TileLayer
-          url="http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}"
-          attribution='&copy; <a href="https://maps.google.com">Google Maps</a> contributors'
-          subdomains={["mt0", "mt1", "mt2", "mt3"]}
-        />
+       <TileLayer
+        url="http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}"
+        attribution='&copy; <a href="https://maps.google.com">Google Maps</a> contributors'
+        subdomains={['mt0', 'mt1', 'mt2', 'mt3']}
+      />
         <Pane name="PaneThai" style={{ zIndex: 650 }}>
           {/* <TileLayer url={"https://apilandinvest.gachmen.org/get_image_landinvest/{z}/{x}/{y}"} pane="overlayPane" minZoom={10} maxZoom={30} maxNativeZoom={30} opacity={opacity} /> */}
           <TileLayer
-            url={'https://han01.vstorage.vngcloud.vn/v1/AUTH_1dbb06310d21466fa9693a9d20fc3965/guland/hoa-binh-2030/{z}/{x}/{y}.png'}
+            url={'http://localhost:8080/data/your_raster_map/{z}/{x}/{y}.png'}
             pane="overlayPane"
             minZoom={10}
             maxZoom={30}
             maxNativeZoom={30}
-            opacity={opacity}
+            opacity={opacity} 
           />
         </Pane>
 
