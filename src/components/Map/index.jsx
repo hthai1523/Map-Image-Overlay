@@ -130,13 +130,11 @@ export default function Map({
         <Pane name="PaneThai" style={{ zIndex: 650 }}>
           {/* <TileLayer url={"https://apilandinvest.gachmen.org/get_image_landinvest/{z}/{x}/{y}"} pane="overlayPane" minZoom={10} maxZoom={30} maxNativeZoom={30} opacity={opacity} /> */}
           <TileLayer
-            url={`https://apilandinvest.gachmen.org/get_image_landinvest_db/{z}/{x}/{y}`}
+            url={'https://apilandinvest.gachmen.org/get_image_landinvest/{z}/{x}/{y}'}
             pane="overlayPane"
-            minZoom={10}
-            maxZoom={30}
-            maxNativeZoom={30}
-            opacity={opacity}  
-            
+            minZoom={12}
+            maxZoom={18}
+            opacity={opacity} 
           />
         </Pane>
 
