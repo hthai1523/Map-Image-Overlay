@@ -123,13 +123,13 @@ export default function Map({
         whenReady={(map) => (mapRef.current = map)}
       >
        <TileLayer
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        url="http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}"
           attribution='&copy; <a href="https://maps.google.com">Google Maps</a> contributors'
-        // subdomains={['mt0', 'mt1', 'mt2', 'mt3']}
+        subdomains={['mt0', 'mt1', 'mt2', 'mt3']}
       />
         <Pane name="PaneThai" style={{ zIndex: 650 }}>
-          {/* <TileLayer url={"https://apilandinvest.gachmen.org/get_image_landinvest/{z}/{x}/{y}"} pane="overlayPane" minZoom={10} maxZoom={30} maxNativeZoom={30} opacity={opacity} /> */}
-          <TileLayer
+          <TileLayer url={"https://apilandinvest.gachmen.org/get_image_landinvest/{z}/{x}/{y}"} pane="overlayPane" minZoom={10} maxZoom={30} maxNativeZoom={30} opacity={opacity} />
+          {/* <TileLayer
             url={`https://apilandinvest.gachmen.org/get_image_landinvest_db/{z}/{x}/{y}`}
             pane="overlayPane"
             minZoom={10}
@@ -137,7 +137,16 @@ export default function Map({
             maxNativeZoom={30}
             opacity={opacity}  
             
-          />
+          /> */}
+          {/* <TileLayer
+            url={'https://github.com/hthai1523/quyhoach/blob/main/{z}/{x}/{y}.png?raw=true'}
+            pane="overlayPane"
+            minZoom={10}
+            maxZoom={30}
+            maxNativeZoom={30}
+            opacity={opacity}  
+            
+          /> */}
         </Pane>
 
         {/* Render Marker with Popup */}
