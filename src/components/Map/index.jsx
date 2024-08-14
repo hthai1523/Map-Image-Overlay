@@ -128,25 +128,14 @@ export default function Map({
         subdomains={['mt0', 'mt1', 'mt2', 'mt3']}
       />
         <Pane name="PaneThai" style={{ zIndex: 650 }}>
-          <TileLayer url={"https://apilandinvest.gachmen.org/get_image_landinvest/{z}/{x}/{y}"} pane="overlayPane" minZoom={10} maxZoom={30} maxNativeZoom={30} opacity={opacity} />
-          {/* <TileLayer
-            url={`https://apilandinvest.gachmen.org/get_image_landinvest_db/{z}/{x}/{y}`}
+          {/* <TileLayer url={"https://apilandinvest.gachmen.org/get_image_landinvest/{z}/{x}/{y}"} pane="overlayPane" minZoom={10} maxZoom={30} maxNativeZoom={30} opacity={opacity} /> */}
+          <TileLayer
+            url={'https://apilandinvest.gachmen.org/get_image_landinvest/{z}/{x}/{y}'}
             pane="overlayPane"
-            minZoom={10}
-            maxZoom={30}
-            maxNativeZoom={30}
-            opacity={opacity}  
-            
-          /> */}
-          {/* <TileLayer
-            url={'https://github.com/hthai1523/quyhoach/blob/main/{z}/{x}/{y}.png?raw=true'}
-            pane="overlayPane"
-            minZoom={10}
-            maxZoom={30}
-            maxNativeZoom={30}
-            opacity={opacity}  
-            
-          /> */}
+            minZoom={12}
+            maxZoom={18}
+            opacity={opacity} 
+          />
         </Pane>
 
         {/* Render Marker with Popup */}
