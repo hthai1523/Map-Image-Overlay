@@ -137,6 +137,24 @@ export default function Map({
             maxZoom={18}
             opacity={opacity}
           />
+          <TileLayer
+            url={
+              "https://apilandinvest.gachmen.org/get_api_quyhoach/2/{z}/{x}/{y}"
+            }
+            pane="overlayPane"
+            minZoom={12}
+            maxZoom={18}
+            opacity={opacity}
+          />
+          <TileLayer
+            url={
+              "https://apilandinvest.gachmen.org/get_api_quyhoach/3/{z}/{x}/{y}"
+            }
+            pane="overlayPane"
+            minZoom={12}
+            maxZoom={18}
+            opacity={opacity}
+          />
           {/* <TileLayer
             url={'http://localhost:8080/data/your_raster_map/{z}/{x}/{y}.png'}
             pane="overlayPane"
