@@ -122,20 +122,29 @@ export default function Map({
         style={{ height: "100%", width: "100%" }}
         whenReady={(map) => (mapRef.current = map)}
       >
-       <TileLayer
-        url="http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}"
+        <TileLayer
+          url="http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}"
           attribution='&copy; <a href="https://maps.google.com">Google Maps</a> contributors'
-        subdomains={['mt0', 'mt1', 'mt2', 'mt3']}
-      />
+          subdomains={["mt0", "mt1", "mt2", "mt3"]}
+        />
         <Pane name="PaneThai" style={{ zIndex: 650 }}>
-          {/* <TileLayer url={"https://apilandinvest.gachmen.org/get_image_landinvest/{z}/{x}/{y}"} pane="overlayPane" minZoom={10} maxZoom={30} maxNativeZoom={30} opacity={opacity} /> */}
           <TileLayer
-            url={'https://apilandinvest.gachmen.org/get_image_landinvest/{z}/{x}/{y}'}
+            url={
+              "https://apilandinvest.gachmen.org/get_api_quyhoach/1/{z}/{x}/{y}"
+            }
             pane="overlayPane"
             minZoom={12}
             maxZoom={18}
-            opacity={opacity} 
+            opacity={opacity}
           />
+          {/* <TileLayer
+            url={'http://localhost:8080/data/your_raster_map/{z}/{x}/{y}.png'}
+            pane="overlayPane"
+            minZoom={10}
+            maxZoom={30}
+            maxNativeZoom={30}
+            opacity={opacity} 
+          /> */}
         </Pane>
 
         {/* Render Marker with Popup */}
