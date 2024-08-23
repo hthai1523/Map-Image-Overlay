@@ -98,6 +98,30 @@ export default function Map({
     }
   }, [coordinates]);
 
+  const [layers, setLayers] = useState([]);
+
+  useEffect(() => {
+    const fetchLayerIds = async () => {
+      const existingIds = [];
+
+      for (let i = 1; i <= 100; i++) {
+        try {
+          const response = await fetch(`https://apilandinvest.gachmen.org/get_api_quyhoach/${i}/0/0/0`);
+          if (response.ok) {
+            existingIds.push(i);
+          }
+        } catch (error) {
+          console.error(`Failed to fetch layer ${i}`, error);
+        }
+      }
+
+      setLayers(existingIds);
+    };
+
+    fetchLayerIds();
+  }, []);
+
+
   // useEffect(() => {
   //   if (currentSize?.width !== 0 && currentSize?.height !== 0) {
   //     setBounds(() => [
@@ -128,7 +152,7 @@ export default function Map({
           subdomains={["mt0", "mt1", "mt2", "mt3"]}
         />
         <Pane name="PaneThai" style={{ zIndex: 650 }}>
-          <TileLayer
+          {/* <TileLayer
             url={
               "https://apilandinvest.gachmen.org/get_api_quyhoach/1/{z}/{x}/{y}"
             }
@@ -145,16 +169,22 @@ export default function Map({
             minZoom={12}
             maxZoom={18}
             opacity={opacity}
-          />
-          <TileLayer
-            url={
-              "https://apilandinvest.gachmen.org/get_api_quyhoach/3/{z}/{x}/{y}"
-            }
-            pane="overlayPane"
-            minZoom={12}
-            maxZoom={18}
-            opacity={opacity}
-          />
+          /> */}
+          {
+            [1,2,3,4,5].map((_, index) => {
+              console.log(index)
+              return <TileLayer
+              key={index}
+              url={
+                `https://apilandinvest.gachmen.org/get_api_quyhoach/${index + 1}/{z}/{x}/{y}`
+              }
+              pane="overlayPane"
+              minZoom={12}
+              maxZoom={18}
+              opacity={opacity}
+            />
+            })
+          }
           {/* <TileLayer
             url={'http://localhost:8080/data/your_raster_map/{z}/{x}/{y}.png'}
             pane="overlayPane"
